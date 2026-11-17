@@ -78,20 +78,35 @@ pipeline {
             }
         }
 
-        stage('Deploy to EKS (Helm)') {
-            steps {
-                sh '''
-                    aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER"
+        
+stage('Deploy to EKS (Helm)') {
+    steps {
+        sh '''
+            set -e
 
-                    helm upgrade --install aws-devops-app helm/aws-devops-app \
-                      --set image.repository="$REGISTRY/$ECR_REPO" \
-                      --set image.tag="$IMAGE_TAG" \
-                      --atomic --timeout 3m
+            aws eks update-kubeconfig \
+              --region "$AWS_REGION" \
+              --name "$EKS_CLUSTER"
 
-                    kubectl get pods -l app=aws-devops-app
-                '''
-            }
-        }
+            helm upgrade --install aws-devops-app helm/aws-devops-app \
+              --namespace default \
+              --set-string image.repository="$REGISTRY/$ECR_REPO" \
+              --set-string image.tag="$IMAGE_TAG" \
+              --wait \
+              --atomic \
+              --timeout 5m
+
+            kubectl rollout status deployment/aws-devops-app \
+              -n default \
+              --timeout=300s
+
+            kubectl get pods \
+              -n default \
+              -l app=aws-devops-app
+        '''
+    }
+}
+
     }
 
     post {
