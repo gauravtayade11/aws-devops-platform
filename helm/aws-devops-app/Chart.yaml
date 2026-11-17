@@ -1,0 +1,6 @@
+apiVersion: v2
+name: aws-devops-app
+description: Helm chart for the AWS DevOps Platform Spring Boot app
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

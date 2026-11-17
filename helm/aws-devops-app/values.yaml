@@ -1,0 +1,24 @@
+replicaCount: 2
+
+image:
+  repository: ""   # set by Jenkins: <account>.dkr.ecr.<region>.amazonaws.com/aws-devops-app
+  tag: latest      # set by Jenkins: build number
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+probes:
+  path: /actuator/health
+  readinessDelay: 15
+  livenessDelay: 30
+
+aws:
+  region: ap-southeast-2
+  dbSecretName: aws-devops/rds   # Secrets Manager secret holding RDS credentials
+
+serviceAccount:
+  create: true
+  name: aws-devops-app
