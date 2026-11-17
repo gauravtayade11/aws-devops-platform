@@ -19,6 +19,11 @@ aws:
   region: ap-southeast-2
   dbSecretName: "rds!db-fa928f53-aa6c-4a0b-89db-54c092a33795"   # Secrets Manager secret holding RDS credentials
 
+db:
+  host: "database-1.c782a806yan3.ap-southeast-2.rds.amazonaws.com"
+  port: "5432"
+  name: postgres  # database name
+
 serviceAccount:
   create: true
   name: aws-devops-app

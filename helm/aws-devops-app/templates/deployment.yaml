@@ -30,6 +30,15 @@ spec:
             - name: DB_SECRET_NAME
               value: {{ .Values.aws.dbSecretName | quote }}
 
+            - name: DB_HOST
+              value: {{ required "db.host is required (RDS endpoint)" .Values.db.host | quote }}
+
+            - name: DB_PORT
+              value: {{ .Values.db.port | quote }}
+
+            - name: DB_NAME
+              value: {{ .Values.db.name | quote }}
+
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
