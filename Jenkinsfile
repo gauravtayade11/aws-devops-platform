@@ -10,6 +10,7 @@ pipeline {
     environment {
         AWS_REGION = 'ap-southeast-2'
         ECR_REPO   = 'aws-devops-app'
+        EKS_CLUSTER = 'aws-devops-eks'
         IMAGE_TAG  = "${BUILD_NUMBER}"
     }
 
@@ -73,6 +74,21 @@ pipeline {
                     docker push "$IMAGE"
 
                     docker logout "$REGISTRY"
+                '''
+            }
+        }
+
+        stage('Deploy to EKS (Helm)') {
+            steps {
+                sh '''
+                    aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER"
+
+                    helm upgrade --install aws-devops-app helm/aws-devops-app \
+                      --set image.repository="$REGISTRY/$ECR_REPO" \
+                      --set image.tag="$IMAGE_TAG" \
+                      --atomic --timeout 3m
+
+                    kubectl get pods -l app=aws-devops-app
                 '''
             }
         }

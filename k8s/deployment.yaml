@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aws-devops-app
+  namespace: default
+  labels:
+    app: aws-devops-app
 spec:
   replicas: 2
   selector:
@@ -13,17 +16,27 @@ spec:
         app: aws-devops-app
     spec:
       containers:
-        - name: app
-          image: IMAGE_PLACEHOLDER
+        - name: aws-devops-app
+          image: 945125987250.dkr.ecr.ap-southeast-2.amazonaws.com/aws-devops-app:4
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
+            periodSeconds: 20
